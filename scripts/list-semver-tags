@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+set -euo pipefail
+
+semver_regex='v?\d+\.\d+\.\d+'
+
+docker-ls tags --template-source '{{range .Tags}}{{.}} {{end}}' $@ |
+tr ' ' '\n' |
+grep -xE $semver_regex |
+sed -r 's/^(v?(\S*))/\2 \1/' |  # strip possible leading v
+sort -V -k1,1 |  # order low to high
+sed -r 's/\S* //'  # add back leading v if it was stripped
